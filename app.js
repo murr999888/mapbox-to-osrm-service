@@ -28,6 +28,16 @@ async function onRequest(clientReq, clientRes) {
   console.log(`Path ${clientReq.url} translated to ${osrmPath}`)
 
   let translatedResult = translateResult(result)
+
+  if (!clientReq.url) {
+    clientRes.code = 500;
+    clientRes.setHeader('Access-Control-Allow-Origin', '*');
+    clientRes.setHeader('Content-Type', 'application/json; charset=utf-8');
+    clientRes.write('Invalid Url!')
+    clientRes.end('\n')  
+    return;
+  }
+
   let destination = getDestination(clientReq.url)
   let origin = getOrigin(clientReq.url);
   let intersections = fetchIntersections(result.routes[0], alternatives)
