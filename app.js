@@ -22,6 +22,17 @@ http.createServer(onRequest).listen(3000)
  * @param {Object} clientRes
  */
 async function onRequest(clientReq, clientRes) {
+  var n = clientReq.url.indexOf("directions/v5/mapbox");
+
+  if (!clientReq.url || n == -1) {
+    clientRes.code = 500;
+    clientRes.setHeader('Access-Control-Allow-Origin', '*');
+    clientRes.setHeader('Content-Type', 'application/json; charset=utf-8');
+    clientRes.write('Invalid Url!');
+    clientRes.end('\n');
+    return;
+  }
+
   let osrmPath = translatePath(clientReq.url)
   let result = await fetch(`${baseUrl}${osrmPath}`).then(res => res.json())
 
@@ -29,14 +40,6 @@ async function onRequest(clientReq, clientRes) {
 
   let translatedResult = translateResult(result)
 
-  if (!clientReq.url) {
-    clientRes.code = 500;
-    clientRes.setHeader('Access-Control-Allow-Origin', '*');
-    clientRes.setHeader('Content-Type', 'application/json; charset=utf-8');
-    clientRes.write('Invalid Url!')
-    clientRes.end('\n')  
-    return;
-  }
 
   let destination = getDestination(clientReq.url)
   let origin = getOrigin(clientReq.url);
